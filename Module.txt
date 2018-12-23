@@ -1,0 +1,7 @@
+﻿Name: CodeSanook.PushNotification
+AntiForgery: enabled
+Author: CodeSanook Team
+Website: http://codesanook.com
+Version: 1.0
+OrchardVersion: 1.0
+Description: An Android/iOS push notification Orchard module

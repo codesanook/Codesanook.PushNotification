@@ -32,6 +32,17 @@ namespace CodeSanook.PushNotification
 
             return 1;
         }
+        
+        public int UpdateFrom1()
+        {
+            SchemaBuilder.CreateTable<PushNotificationSettingPartRecord>(
+                tableCommand => tableCommand
+                    .ContentPartRecord()
+                    .Column<PushNotificationSettingPartRecord, string>(table => table.ApiKey)
+            );
+
+            return 2;
+        }
     }
 
 }

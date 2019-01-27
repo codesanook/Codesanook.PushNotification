@@ -1,0 +1,80 @@
+﻿@using CodeSanook.Common.Web
+@{
+    Layout.Title = T("Push Notification").ToString();
+}
+
+@{
+    //add shared JavaScript Libraries, require function preventing to include it again
+    Script.Require("jQuery").AtHead();
+    Script.Require("AngularJs").AtHead();
+    Script.Require("AngularJs_Messages").AtHead();
+    Script.Require("Lodash").AtHead();
+    Script.Require("SystemJS").AtHead();//with name and path
+
+    var scriptRoot = this.GetUrlPathRelativeToModule("Scripts");
+}
+<script>
+    System.config({
+        packages: {
+            "": {
+                defaultExtension: 'js' //default extension for all packages
+            }
+        }
+    });
+
+    System.import("@this.Combine(scriptRoot, "App")");//import main JavaScript
+</script>
+
+<form class="push-notification-app"
+      ng-controller="pushNotificationController as ctrl"
+      name="pushNotificationForm"
+      ng-submit="ctrl.submitForm(pushNotificationForm, $event)"
+      novalidate>
+
+    @Html.AntiForgeryToken()
+    <fieldset>
+        <label>Title</label>
+        <input type="text"
+               name="title"
+               ng-model="ctrl.message.title"
+               ng-required="true" />
+        <div ng-messages="pushNotificationForm.$error"
+             ng-if="pushNotificationForm.title.$invalid && pushNotificationForm.$submitted">
+            <div ng-message="required">
+                Please enter push notification message's title.
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <label>Body</label>
+        <input type="text"
+               name="body"
+               ng-model="ctrl.message.body"
+               ng-required="true" />
+        <div ng-messages="pushNotificationForm.$error"
+             ng-if="pushNotificationForm.body.$invalid && pushNotificationForm.$submitted">
+            <div ng-message="required">
+                Please enter push notification message's body.
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <label>Email</label>
+        <input type="text"
+               name="email"
+               ng-model="ctrl.message.email"
+               ng-required="true" />
+        <div ng-messages="pushNotificationForm.$error"
+             ng-if="pushNotificationForm.email.$invalid && pushNotificationForm.$submitted">
+            <div ng-message="required">
+                Please enter push notification message's email of a receiver.
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <button class="primaryAction" type="submit">@T("Send push notification")</button>
+    </fieldset>
+</form>

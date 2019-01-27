@@ -1,0 +1,9 @@
+﻿@model CodeSanook.PushNotification.Models.PushNotificationSettingPart
+<fieldset>
+    <legend><strong>@T("CodeSanook Push Notification Setting")</strong></legend>
+    <div>
+        @Html.LabelFor(m => m.ApiKey)
+        @Html.EditorFor(m => m.ApiKey)
+        @Html.ValidationMessageFor(m => m.ApiKey)
+    </div>
+</fieldset>

@@ -11,6 +11,8 @@ using System.Text;
 using System.Web.Http;
 using Orchard.ContentManagement;
 using Orchard;
+using System.Collections.Generic;
+using System.Dynamic;
 
 namespace CodeSanook.PushNotification.Controllers
 {
@@ -20,7 +22,7 @@ namespace CodeSanook.PushNotification.Controllers
         private readonly IOrchardServices orchardService;
 
         public PushNotificationsController(
-            IOrchardServices orchardService, 
+            IOrchardServices orchardService,
             IContentManager contentManager
         )
         {
@@ -42,70 +44,73 @@ namespace CodeSanook.PushNotification.Controllers
             }
 
             var pushNotificationPart = user.As<PushNotificationPart>();
-            SendGCMNotification(pushNotificationPart.RegistrationId, request);
+            SendGCMNotification(pushNotificationPart, request);
         }
 
-        private string SendGCMNotification(string registrationId, PushNotificationMessage pushNotificationMessage)
+        private string SendGCMNotification(PushNotificationPart pushNotificationPart, PushNotificationMessage message)
         {
-            var message = new
+            dynamic payload = new ExpandoObject();
+            payload.registration_ids = new[] { pushNotificationPart.RegistrationId };
+            payload.priority = "high";
+            const string soundName = "default";
+
+            switch (pushNotificationPart.Platform.ToUpperInvariant())
             {
-                notification = new
-                {
-                    sound = "default",
-                    title = pushNotificationMessage.Title,
-                    body = pushNotificationMessage.Body,
-                    someKey = "someValue"
-                },
-                registration_ids = new[] { registrationId },
-                priority = "high",
-                content_available = true,
-                mutable_content = true
-            };
+                case "IOS":
+                    payload.notification = new
+                    {
+                        title = message.Title,
+                        body = message.Body,
+                        sound = soundName
+                    };
+                    break;
+                case "ANDROID"://work for start up and get push in background
+                    payload.data = new
+                    {
+                        title = message.Title,
+                        body = message.Body,
+                        soundname  = soundName
+                    };
+                    break;
+                default:
+                    throw new InvalidCastException("no valid registration platform");
+            }
 
-            //  MESSAGE CONTENT
-            byte[] byteArray = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
+            var payloadJson = JsonConvert.SerializeObject(payload);
+            var payloadData = Encoding.UTF8.GetBytes(payloadJson);
 
-            //  CREATE REQUEST
             ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback(ValidateServerCertificate);
-            HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("https://android.googleapis.com/gcm/send");
-            Request.Method = "POST";
-            Request.KeepAlive = false;
-            Request.ContentType = "application/json";
+            var request = (HttpWebRequest)WebRequest.Create("https://fcm.googleapis.com/fcm/send");
+            request.Method = "POST";
+            request.KeepAlive = false;
+            request.ContentType = "application/json";
 
             var setting = this.orchardService.WorkContext.CurrentSite.As<PushNotificationSettingPart>();
-            Request.Headers.Add($"Authorization: key={setting.ApiKey}");
-            Request.ContentLength = byteArray.Length;
+            request.Headers.Add($"Authorization: key={setting.ApiKey}");
+            // We don't need header of Sender: id=xxx but some examples on the internet add it.
+            request.ContentLength = payloadData.Length;
 
-            var dataStream = Request.GetRequestStream();
-            dataStream.Write(byteArray, 0, byteArray.Length);
-
-            dataStream.Close();
-            //  SEND MESSAGE
-            try
+            WebResponse response;
+            using (var dataStream = request.GetRequestStream())
             {
-                WebResponse Response = Request.GetResponse();
-                HttpStatusCode ResponseCode = ((HttpWebResponse)Response).StatusCode;
-                if (ResponseCode.Equals(HttpStatusCode.Unauthorized) || ResponseCode.Equals(HttpStatusCode.Forbidden))
-                {
-                    Console.WriteLine("Unauthorized - need new token");
-                }
+                dataStream.Write(payloadData, 0, payloadData.Length);
+                response = request.GetResponse();
+            }
+            var responseCode = ((HttpWebResponse)response).StatusCode;
+            if (responseCode.Equals(HttpStatusCode.Unauthorized) || responseCode.Equals(HttpStatusCode.Forbidden))
+            {
+                throw new InvalidOperationException("Unauthorized - need new token");
+            }
+            else if (!responseCode.Equals(HttpStatusCode.OK))
+            {
+                throw new InvalidOperationException("Response from web service isn't OK");
+            }
 
-                else if (!ResponseCode.Equals(HttpStatusCode.OK))
-                {
-                    Console.WriteLine("Response from web service isn't OK");
-                }
-
-                var reader = new StreamReader(Response.GetResponseStream());
-                string responseLine = reader.ReadToEnd();
-                reader.Close();
+            using (var reader = new StreamReader(response.GetResponseStream()))
+            {
+                var responseLine = reader.ReadToEnd();
                 return responseLine;
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message); ;
-                Console.WriteLine(e.StackTrace); ;
-            }
-            return "error";
         }
 
         public static bool ValidateServerCertificate(

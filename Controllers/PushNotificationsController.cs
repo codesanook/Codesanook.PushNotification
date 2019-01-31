@@ -11,7 +11,6 @@ using System.Text;
 using System.Web.Http;
 using Orchard.ContentManagement;
 using Orchard;
-using System.Collections.Generic;
 using System.Dynamic;
 
 namespace CodeSanook.PushNotification.Controllers
@@ -61,7 +60,7 @@ namespace CodeSanook.PushNotification.Controllers
                     {
                         title = message.Title,
                         body = message.Body,
-                        sound = soundName
+                        sound = soundName,
                     };
                     break;
                 case "ANDROID"://work for start up and get push in background
@@ -69,7 +68,7 @@ namespace CodeSanook.PushNotification.Controllers
                     {
                         title = message.Title,
                         body = message.Body,
-                        soundname  = soundName
+                        soundname  = soundName,
                     };
                     break;
                 default:

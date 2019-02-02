@@ -1,59 +1,55 @@
-﻿using CodeSanook.PushNotification.Models;
+﻿using CodeSanook.PushNotification.Controllers;
+using CodeSanook.PushNotification.Models;
 using Newtonsoft.Json;
-using Orchard.Users.Models;
+using Orchard;
+using Orchard.ContentManagement;
+using Orchard.Logging;
 using System;
+using System.Dynamic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Web.Http;
-using Orchard.ContentManagement;
-using Orchard;
-using System.Dynamic;
 
-namespace CodeSanook.PushNotification.Controllers
+namespace CodeSanook.PushNotification.Services
 {
-    public class PushNotificationsController : ApiController
+    public class PushNotificationService : IPushNotificationService
     {
         private readonly IContentManager contentManager;
         private readonly IOrchardServices orchardService;
+        public ILogger Logger;
 
-        public PushNotificationsController(
+        public PushNotificationService(
             IOrchardServices orchardService,
             IContentManager contentManager
         )
         {
             this.orchardService = orchardService;
             this.contentManager = contentManager;
+            Logger = NullLogger.Instance;
         }
 
-        public void Post(PushNotificationMessage request)
+        public void SendPush(PushNotificationPart pushNotificationPart, PushNotificationMessage message)
         {
-            var user = contentManager
-                .Query<UserPart, UserPartRecord>()
-                .Where(u => u.Email == request.Email)
-                .List()
-                .SingleOrDefault();
-
-            if (user == null)
+            try
             {
-                throw new InvalidOperationException($"No user with email {request.Email}");
+                SendPushToFCM(pushNotificationPart, message);
             }
-
-            var pushNotificationPart = user.As<PushNotificationPart>();
-            SendGCMNotification(pushNotificationPart, request);
+            catch (Exception ex)
+            {
+                Logger.Error(ex, ex.Message);
+            }
         }
 
-        private string SendGCMNotification(PushNotificationPart pushNotificationPart, PushNotificationMessage message)
+        private void SendPushToFCM(PushNotificationPart pushNotificationParts, PushNotificationMessage message)
         {
             dynamic payload = new ExpandoObject();
-            payload.registration_ids = new[] { pushNotificationPart.RegistrationId };
+            payload.registration_ids = new[] { pushNotificationParts.RegistrationId };
             payload.priority = "high";
             const string soundName = "default";
 
-            switch (pushNotificationPart.Platform.ToUpperInvariant())
+            switch (pushNotificationParts.Platform.ToUpperInvariant())
             {
                 case "IOS":
                     payload.notification = new
@@ -68,7 +64,7 @@ namespace CodeSanook.PushNotification.Controllers
                     {
                         title = message.Title,
                         body = message.Body,
-                        soundname  = soundName,
+                        soundname = soundName,
                     };
                     break;
                 default:
@@ -108,7 +104,6 @@ namespace CodeSanook.PushNotification.Controllers
             using (var reader = new StreamReader(response.GetResponseStream()))
             {
                 var responseLine = reader.ReadToEnd();
-                return responseLine;
             }
         }
 

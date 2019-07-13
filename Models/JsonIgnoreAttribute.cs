@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CodeSanook.PushNotification.Models
+namespace Codesanook.PushNotification.Models
 {
     internal class JsonIgnoreAttribute : Attribute
     {

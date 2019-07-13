@@ -1,7 +1,7 @@
 ﻿using Orchard.ContentManagement;
 using System.ComponentModel.DataAnnotations;
 
-namespace CodeSanook.PushNotification.Models
+namespace Codesanook.PushNotification.Models
 {
     public class PushNotificationSettingPart : ContentPart<PushNotificationSettingPartRecord>
     {

@@ -1,4 +1,4 @@
-﻿namespace CodeSanook.PushNotification.Controllers
+﻿namespace Codesanook.PushNotification.Controllers
 {
     public class PushNotificationMessage
     {

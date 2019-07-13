@@ -1,11 +1,11 @@
-﻿using CodeSanook.PushNotification.Drivers;
-using CodeSanook.PushNotification.Models;
+﻿using Codesanook.PushNotification.Drivers;
+using Codesanook.PushNotification.Models;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Handlers;
 using Orchard.Data;
 using Orchard.Localization;
 
-namespace CodeSanook.PushNotification.Handlers
+namespace Codesanook.PushNotification.Handlers
 {
     public class PushNotificationSettingPartHandler : ContentHandler
     {

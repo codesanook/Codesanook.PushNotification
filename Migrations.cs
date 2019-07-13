@@ -1,13 +1,13 @@
 ﻿using Orchard.Data.Migration;
-using CodeSanook.PushNotification.Models;
-using CodeSanook.Common.Data;
+using Codesanook.PushNotification.Models;
+using Codesanook.Common.Data;
 using System;
 using Orchard.ContentManagement.MetaData;
 using Orchard.Core.Contents.Extensions;
 using Orchard.Users.Models;
-using CodeSanook.Common.Models;
+using Codesanook.Common.Models;
 
-namespace CodeSanook.PushNotification
+namespace Codesanook.PushNotification
 {
     public class Migrations : DataMigrationImpl
     {

@@ -1,5 +1,5 @@
-﻿using CodeSanook.PushNotification.Controllers;
-using CodeSanook.PushNotification.Models;
+﻿using Codesanook.PushNotification.Controllers;
+using Codesanook.PushNotification.Models;
 using Newtonsoft.Json;
 using Orchard;
 using Orchard.ContentManagement;
@@ -12,7 +12,7 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
-namespace CodeSanook.PushNotification.Services
+namespace Codesanook.PushNotification.Services
 {
     public class PushNotificationService : IPushNotificationService
     {

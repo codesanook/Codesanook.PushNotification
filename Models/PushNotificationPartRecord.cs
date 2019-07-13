@@ -2,7 +2,7 @@
 using Orchard.ContentManagement.Records;
 using System;
 
-namespace CodeSanook.PushNotification.Models
+namespace Codesanook.PushNotification.Models
 {
     public class PushNotificationPartRecord:ContentPartRecord
     {

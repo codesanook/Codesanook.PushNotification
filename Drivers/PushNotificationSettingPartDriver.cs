@@ -2,9 +2,9 @@
 using Orchard.ContentManagement.Drivers;
 using Orchard.UI.Notify;
 using Orchard.Localization;
-using CodeSanook.PushNotification.Models;
+using Codesanook.PushNotification.Models;
 
-namespace CodeSanook.PushNotification.Drivers
+namespace Codesanook.PushNotification.Drivers
 {
     public class PushNotificationSettingPartDriver : ContentPartDriver<PushNotificationSettingPart>
     {

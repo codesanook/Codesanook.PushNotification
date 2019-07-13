@@ -1,8 +1,8 @@
-﻿using CodeSanook.PushNotification.Controllers;
-using CodeSanook.PushNotification.Models;
+﻿using Codesanook.PushNotification.Controllers;
+using Codesanook.PushNotification.Models;
 using Orchard;
 
-namespace CodeSanook.PushNotification.Services
+namespace Codesanook.PushNotification.Services
 {
     public interface IPushNotificationService : IDependency
     {

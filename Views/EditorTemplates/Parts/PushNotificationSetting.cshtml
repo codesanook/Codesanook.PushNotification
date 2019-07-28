@@ -3,7 +3,7 @@
     <legend><strong>@T("CodeSanook Push Notification Setting")</strong></legend>
     <div>
         @Html.LabelFor(m => m.ApiKey)
-        @Html.EditorFor(m => m.ApiKey)
+        @Html.TextBoxFor(m => m.ApiKey, new { @class = "text large" })
         @Html.ValidationMessageFor(m => m.ApiKey)
     </div>
 </fieldset>
